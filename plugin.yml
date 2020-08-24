@@ -1,0 +1,22 @@
+name: SSH
+description: Execute commands on remote servers.
+author: https://adabay.rocks
+configuration:
+  properties:
+    server_address:
+      type: string
+    port:
+      type: integer
+    username:
+      type: string
+    private_key_env_variable:
+      type: string
+    script_path:
+      type: string
+    injected_env_variables:
+      type: array
+  required:
+    - server_address
+    - username
+    - private_key_env_variable
+    - script_path

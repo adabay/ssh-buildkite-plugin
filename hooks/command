@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -eo pipefail
+
+PORT=${BUILDKITE_PLUGIN_SSH_PORT:-22}
+
+echo "--- Executing script \"$BUILDKITE_PLUGIN_SSH_SCRIPT_PATH\" on server \"$BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS:$PORT\"."
+
+mkdir .tmp
+chmod 700 .tmp
+touch .tmp/private_key
+chmod 600 .tmp/private_key
+
+eval echo \"\$$BUILDKITE_PLUGIN_SSH_PRIVATE_KEY_ENV_VARIABLE\" > .tmp/private_key
+
+ssh-keyscan -H $BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS >> ~/.ssh/known_hosts
+
+EXPORT_ENV_VARIABLES_SCRIPT_PATH=".export_environment_variables.sh"
+touch ${EXPORT_ENV_VARIABLES_SCRIPT_PATH}
+
+injected_env_variables=()
+
+while IFS='=' read -r injected_env_variable _ ; do
+  if [[ $injected_env_variable =~ ^(BUILDKITE_PLUGIN_SSH_INJECTED_ENV_VARIABLES_[0-9]+$) ]]; then
+    MULTIPLE_INJECTED_ENV_VARIABLES="true"
+    injected_env_variables+=("${!injected_env_variable}")
+  fi
+done < <(env | sort)
+
+if [[ "${MULTIPLE_INJECTED_ENV_VARIABLES}" == "true" ]]; then
+    index=0
+
+    for injected_env_variable in "${injected_env_variables[@]}"
+    do
+        injected_env_variable_env_var="BUILDKITE_PLUGIN_SSH_INJECTED_ENV_VARIABLES_${index}"
+
+        injected_env_variable_name="${!injected_env_variable_env_var}"
+
+        echo "export ${injected_env_variable_name}=\"${!injected_env_variable_name}\"" >> ${EXPORT_ENV_VARIABLES_SCRIPT_PATH}
+
+        ((index+=1))
+    done
+fi
+
+sed -i -e "/#!\/bin\/bash/r $EXPORT_ENV_VARIABLES_SCRIPT_PATH" ${BUILDKITE_PLUGIN_SSH_SCRIPT_PATH}
+
+ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} 'bash -s' < "${BUILDKITE_PLUGIN_SSH_SCRIPT_PATH}"
+
+rm ${EXPORT_ENV_VARIABLES_SCRIPT_PATH}
+rm -r .tmp
