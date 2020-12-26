@@ -6,7 +6,14 @@ IFS=$'\n'
 for command in $BUILDKITE_COMMAND
 do
     rawCommand=$(echo $command | cut -d " " -f 1)
-    echo "command -v $rawCommand"
-    command -v $rawCommand
-    echo "ssh user@server \"bash -s\" -- < $command"
+
+    if [[ -f $rawCommand]]; then
+        echo "Executing local script at path $rawCommand on remote server."
+        echo "ssh user@server \"bash -s\" -- < $command"
+    else
+        echo "command -v $rawCommand"
+        rawCommandSource=$(command -v $rawCommand)
+        echo $rawCommandSource
+        echo "ssh user@server \"bash -s\" -- < $command"
+    fi
 done
