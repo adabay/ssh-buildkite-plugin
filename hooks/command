@@ -52,7 +52,6 @@ do
         # echo "ssh user@server \"bash -s\" -- < $command"
     else
         echo "Command or script $rawCommand not found on server."
-        exit 1
     fi
 
     echo "Checking if $rawCommand exists as command on agent."
@@ -62,6 +61,5 @@ do
         # echo "ssh user@server \"bash -s\" -- < $command"
     else
         echo "Command or script $rawCommand not found on agent."
-        exit 1
     fi
 done
