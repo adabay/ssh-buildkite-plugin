@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eo pipefail
-
 IFS=$'\n'
 for command in $BUILDKITE_COMMAND
 do
@@ -9,15 +7,18 @@ do
 
     echo "Processing command $rawCommand ..."
 
-    pwd
-
     if [[ -f $rawCommand ]] ; then
         echo "Executing local script at path $rawCommand on remote server."
         echo "ssh user@server \"bash -s\" -- < $command"
     else
         echo "command -v $rawCommand"
         rawCommandSource=$(command -v $rawCommand)
-        echo $rawCommandSource
-        echo "ssh user@server \"bash -s\" -- < $command"
+        if [ $? -eq 0 ]; then
+            echo "Command $rawCommand found: $rawCommandSource"
+            echo "ssh user@server \"bash -s\" -- < $command"
+        else
+            echo "Command $rawCommand not found. Aborting pipeline execution."
+            exit 1
+        fi
     fi
 done
