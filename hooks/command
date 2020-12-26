@@ -8,7 +8,7 @@ if [ -z $SSH_AGENT_PID ]; then
 fi
 
 ssh-keyscan -H "${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}" -p ${PORT} >> ~/.ssh/known_hosts
-ssh-add - <<< "${PRIVATE_KEY}"
+ssh-add -t 90m - <<< "${PRIVATE_KEY}"
 
 echo "+++ Checking preconditions"
 
