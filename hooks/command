@@ -106,6 +106,6 @@ fi
 echo "+++ Executing commands on remote server."
 for command in "${commands[@]}"
 do
-    "Executing command \"$command\""
+    echo "Executing command \"$command\""
     eval $command
 done
