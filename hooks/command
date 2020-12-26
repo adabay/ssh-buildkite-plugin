@@ -31,6 +31,10 @@ do
 
     echo "Processing command $rawCommand ..."
 
+    if [[ ! ${#rawCommand} == ${#command} ]]; then
+        commandOptions=$(echo $command | cut -c $((${#rawCommand} + 2))-${#command})
+    fi
+
     echo -e "Checking if $rawCommand exists as script file on server."
     ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
     if [ $? -eq 0 ]; then
@@ -85,7 +89,7 @@ do
         echo "Using script file from server: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$commandOnAgent" == true ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${command}"
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${rawCommandSource} ${commandOptions}"
         echo "Using command from agent: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$scriptFileOnAgent" == true ]]; then
