@@ -5,7 +5,7 @@ set -eo pipefail
 IFS=$'\n'
 for command in $BUILDKITE_COMMAND
 do
-    $rawCommand=$(echo $command | cut -d " " -f 1)
+    rawCommand=$(echo $command | cut -d " " -f 1)
     echo "command -v $rawCommand"
     command -v $rawCommand
     echo "ssh user@server \"bash -s\" -- < $command"
