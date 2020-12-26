@@ -43,35 +43,35 @@ do
 
     echo ":arrows_counterclockwise: Checking if $rawCommand exists as script file on agent."
     if [[ -f $rawCommand ]] ; then
-        echo -e ":white_check_mark: Script file $rawCommand found on agent."
+        echo -e "\xE2\x9C\x94 Script file $rawCommand found on agent."
         scriptFileOnAgent=true
     else
-        echo -e ":x: Script file $rawCommand not found on agent."
+        echo -e "\xE2\x9D\x8C Script file $rawCommand not found on agent."
         scriptFileOnAgent=false
     fi
 
     echo ":arrows_counterclockwise: Checking if $rawCommand exists as command on server."
     rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
-        echo -e ":white_check_mark: Command or script $rawCommand found on server: $rawCommandSource"
+        echo -e "\xE2\x9C\x94 Command or script $rawCommand found on server: $rawCommandSource"
         commandOnServer=true
     else
-        echo -e ":x: Command or script $rawCommand not found on server."
+        echo -e "\xE2\x9D\x8C Command or script $rawCommand not found on server."
         commandOnServer=false
     fi
 
     echo ":arrows_counterclockwise: Checking if $rawCommand exists as command on agent."
     rawCommandSource=$(command -v $rawCommand)
     if [ $? -eq 0 ]; then
-        echo -e ":white_check_mark: Command or script $rawCommand found on agent: $rawCommandSource"
+        echo -e "\xE2\x9C\x94 Command or script $rawCommand found on agent: $rawCommandSource"
         commandOnAgent=true
     else
-        echo -e ":x: Command or script $rawCommand not found on agent."
+        echo -e "\xE2\x9D\x8C Command or script $rawCommand not found on agent."
         commandOnAgent=false
     fi
 
     if [[ "$scriptFileOnServer" == true || "$scriptFileOnAgent" == true || "$commandOnServer" == true || "$commandOnAgent" == true ]]; then
-        echo -e ":white_check_mark: Command $command is valid and can be executed."
+        echo -e "\xE2\x9C\x94 Command $command is valid and can be executed."
     else
         allCommandsValid=false
     fi
@@ -96,10 +96,10 @@ do
 done
 
 if [[ "$allCommandsValid" == true ]]; then
-    echo -e ":white_check_mark: Preconditions are met."
+    echo -e "\xE2\x9C\x94 Preconditions are met."
     echo "^^^ ---"
 else
-    echo -e ":x: Preconditions are not met. Aborting execution."
+    echo -e "\xE2\x9D\x8C Preconditions are not met. Aborting execution."
     exit 1
 fi
 
