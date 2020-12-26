@@ -7,6 +7,8 @@ for command in $BUILDKITE_COMMAND
 do
     rawCommand=$(echo $command | cut -d " " -f 1)
 
+    echo "Processing command $rawCommand ..."
+
     if [[ -f $rawCommand ]] ; then
         echo "Executing local script at path $rawCommand on remote server."
         echo "ssh user@server \"bash -s\" -- < $command"
