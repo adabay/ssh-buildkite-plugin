@@ -36,7 +36,7 @@ do
     fi
 
     echo -e "Checking if $rawCommand exists as script file on server."
-    ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
+    ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Script file $rawCommand found on server."
         scriptFileOnServer=true
@@ -55,7 +55,7 @@ do
     fi
 
     echo "Checking if $rawCommand exists as command on server."
-    rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
+    rawCommandSource=$(ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Command or script $rawCommand found on server: $rawCommandSource"
         commandOnServer=true
@@ -81,19 +81,19 @@ do
     fi
 
     if [[ "$commandOnServer" == true ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -c -- ${command}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -c -- ${command}"
         echo "Using command from server: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$scriptFileOnServer" == true ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash $command"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash $command"
         echo "Using script file from server: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$commandOnAgent" == true ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${rawCommandSource} ${commandOptions}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${rawCommandSource} ${commandOptions}"
         echo "Using command from agent: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$scriptFileOnAgent" == true ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${command}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${command}"
         echo "Using script file from agent: $sshCommand"
         commands+=($sshCommand)
     fi
