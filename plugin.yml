@@ -1,6 +1,7 @@
 name: SSH
 description: Execute commands on remote servers.
 author: https://adabay.rocks
+requirements: []
 configuration:
   properties:
     server_address:
