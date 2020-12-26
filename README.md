@@ -20,7 +20,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - maierj/ssh#master:
+      - maierj/ssh:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
