@@ -31,47 +31,47 @@ do
 
     echo "Processing command $rawCommand ..."
 
-    echo "Checking if $rawCommand exists as script file on server."
+    echo ":arrows_counterclockwise: Checking if $rawCommand exists as script file on server."
     ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
     if [ $? -eq 0 ]; then
-        echo "Script file $rawCommand found on server."
+        echo ":white_check_mark: Script file $rawCommand found on server."
         scriptFileOnServer=true
     else
-        echo "Script file $rawCommand not found on server."
+        echo ":x: Script file $rawCommand not found on server."
         scriptFileOnServer=false
     fi
 
-    echo "Checking if $rawCommand exists as script file on agent."
+    echo ":arrows_counterclockwise: Checking if $rawCommand exists as script file on agent."
     if [[ -f $rawCommand ]] ; then
-        echo "Script file $rawCommand found on agent."
+        echo ":white_check_mark: Script file $rawCommand found on agent."
         scriptFileOnAgent=true
     else
-        echo "Script file $rawCommand not found on agent."
+        echo ":x: Script file $rawCommand not found on agent."
         scriptFileOnAgent=false
     fi
 
-    echo "Checking if $rawCommand exists as command on server."
+    echo ":arrows_counterclockwise: Checking if $rawCommand exists as command on server."
     rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
-        echo "Command or script $rawCommand found on server: $rawCommandSource"
+        echo ":white_check_mark: Command or script $rawCommand found on server: $rawCommandSource"
         commandOnServer=true
     else
-        echo "Command or script $rawCommand not found on server."
+        echo ":x: Command or script $rawCommand not found on server."
         commandOnServer=false
     fi
 
-    echo "Checking if $rawCommand exists as command on agent."
+    echo ":arrows_counterclockwise: Checking if $rawCommand exists as command on agent."
     rawCommandSource=$(command -v $rawCommand)
     if [ $? -eq 0 ]; then
-        echo "Command or script $rawCommand found on agent: $rawCommandSource"
+        echo ":white_check_mark: Command or script $rawCommand found on agent: $rawCommandSource"
         commandOnAgent=true
     else
-        echo "Command or script $rawCommand not found on agent."
+        echo ":x: Command or script $rawCommand not found on agent."
         commandOnAgent=false
     fi
 
     if [[ $scriptFileOnServer || $scriptFileOnAgent || $commandOnServer || $commandOnAgent ]]; then
-        echo "Command $command is valid and can be executed."
+        echo ":white_check_mark: Command $command is valid and can be executed."
     else
         allCommandsValid=false
     fi
@@ -96,10 +96,10 @@ do
 done
 
 if [[ allCommandsValid ]]; then
-    echo "Preconditions are met."
+    echo ":white_check_mark: Preconditions are met."
     echo "^^^ ---"
 else
-    echo "Preconditions are not met. Aborting execution."
+    echo ":x: Preconditions are not met. Aborting execution."
     exit 1
 fi
 
