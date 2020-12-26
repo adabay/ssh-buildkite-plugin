@@ -70,32 +70,32 @@ do
         commandOnAgent=false
     fi
 
-    if [[ $scriptFileOnServer || $scriptFileOnAgent || $commandOnServer || $commandOnAgent ]]; then
+    if [[ "$scriptFileOnServer" == true || "$scriptFileOnAgent" == true || "$commandOnServer" == true || "$commandOnAgent" == true ]]; then
         echo -e ":white_check_mark: Command $command is valid and can be executed."
     else
         allCommandsValid=false
     fi
 
-    if [[ $commandOnServer ]]; then
+    if [[ "$commandOnServer" == true ]]; then
         sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -c -- ${command}"
         echo "Using command from server: $sshCommand"
         commands+=($sshCommand)
-    elif [[ $scriptFileOnServer ]]; then
+    elif [[ "$scriptFileOnServer" == true ]]; then
         sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash $command"
         echo "Using script file from server: $sshCommand"
         commands+=($sshCommand)
-    elif [[ $commandOnAgent ]]; then
+    elif [[ "$commandOnAgent" == true ]]; then
         sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}  \"bash -s\" -- < $command"
         echo "Using command from agent: $sshCommand"
         commands+=($sshCommand)
-    elif [[ $scriptFileOnAgent ]]; then
+    elif [[ "$scriptFileOnAgent" == true ]]; then
         sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < $command"
         echo "Using script file from agent: $sshCommand"
         commands+=($sshCommand)
     fi
 done
 
-if [[ allCommandsValid ]]; then
+if [[ "$allCommandsValid" == true ]]; then
     echo -e ":white_check_mark: Preconditions are met."
     echo "^^^ ---"
 else
