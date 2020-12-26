@@ -1,5 +1,115 @@
 #!/bin/bash
 
-set -eo pipefail
+PORT=${BUILDKITE_PLUGIN_SSH_PORT:-22}
+PRIVATE_KEY="$(eval echo \"\$$BUILDKITE_PLUGIN_SSH_PRIVATE_KEY_ENV_VARIABLE\")"
 
-echo "$BUILDKITE_COMMAND"
+mkdir .tmp
+chmod 700 .tmp
+touch .tmp/private_key
+chmod 600 .tmp/private_key
+
+echo "$PRIVATE_KEY" > .tmp/private_key
+
+echo "+++ Checking preconditions"
+
+echo "Testing SSH connection..."
+ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} 'echo "Connection Test"' > /dev/null
+if [ $? -eq 0 ]; then
+    echo "SSH connection succeeded."
+else
+    echo "SSH connection failed."
+    exit 1
+fi
+
+commands=()
+allCommandsValid=true
+
+IFS=$'\n'
+for command in $BUILDKITE_COMMAND
+do
+    rawCommand=$(echo $command | cut -d " " -f 1)
+
+    echo "Processing command $rawCommand ..."
+
+    if [[ ! ${#rawCommand} == ${#command} ]]; then
+        commandOptions=$(echo $command | cut -c $((${#rawCommand} + 2))-${#command})
+    fi
+
+    echo -e "Checking if $rawCommand exists as script file on server."
+    ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
+    if [ $? -eq 0 ]; then
+        echo -e "\xE2\x9C\x94 Script file $rawCommand found on server."
+        scriptFileOnServer=true
+    else
+        echo -e "\xE2\x9D\x8C Script file $rawCommand not found on server."
+        scriptFileOnServer=false
+    fi
+
+    echo "Checking if $rawCommand exists as script file on agent."
+    if [[ -f $rawCommand ]] ; then
+        echo -e "\xE2\x9C\x94 Script file $rawCommand found on agent."
+        scriptFileOnAgent=true
+    else
+        echo -e "\xE2\x9D\x8C Script file $rawCommand not found on agent."
+        scriptFileOnAgent=false
+    fi
+
+    echo "Checking if $rawCommand exists as command on server."
+    rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
+    if [ $? -eq 0 ]; then
+        echo -e "\xE2\x9C\x94 Command or script $rawCommand found on server: $rawCommandSource"
+        commandOnServer=true
+    else
+        echo -e "\xE2\x9D\x8C Command or script $rawCommand not found on server."
+        commandOnServer=false
+    fi
+
+    echo "Checking if $rawCommand exists as command on agent."
+    rawCommandSource=$(command -v $rawCommand)
+    if [ $? -eq 0 ]; then
+        echo -e "\xE2\x9C\x94 Command or script $rawCommand found on agent: $rawCommandSource"
+        commandOnAgent=true
+    else
+        echo -e "\xE2\x9D\x8C Command or script $rawCommand not found on agent."
+        commandOnAgent=false
+    fi
+
+    if [[ "$scriptFileOnServer" == true || "$scriptFileOnAgent" == true || "$commandOnServer" == true || "$commandOnAgent" == true ]]; then
+        echo -e "\xE2\x9C\x94 Command $command is valid and can be executed."
+    else
+        allCommandsValid=false
+    fi
+
+    if [[ "$commandOnServer" == true ]]; then
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -c -- ${command}"
+        echo "Using command from server: $sshCommand"
+        commands+=($sshCommand)
+    elif [[ "$scriptFileOnServer" == true ]]; then
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash $command"
+        echo "Using script file from server: $sshCommand"
+        commands+=($sshCommand)
+    elif [[ "$commandOnAgent" == true ]]; then
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${rawCommandSource} ${commandOptions}"
+        echo "Using command from agent: $sshCommand"
+        commands+=($sshCommand)
+    elif [[ "$scriptFileOnAgent" == true ]]; then
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${command}"
+        echo "Using script file from agent: $sshCommand"
+        commands+=($sshCommand)
+    fi
+done
+
+if [[ "$allCommandsValid" == true ]]; then
+    echo -e "\xE2\x9C\x94 Preconditions are met."
+    echo "^^^ ---"
+else
+    echo -e "\xE2\x9D\x8C Preconditions are not met. Aborting execution."
+    exit 1
+fi
+
+echo "+++ Executing commands on remote server."
+for command in "${commands[@]}"
+do
+    echo "Executing command \"$command\""
+    bash -c -- $command
+done
