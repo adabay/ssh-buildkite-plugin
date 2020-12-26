@@ -20,7 +20,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - maierj/ssh#v0.9.0:
+      - maierj/ssh#v0.9.1:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -39,6 +39,10 @@ The username that should be used for the SSH connection.
 ### `private_key_env_variable` (Required, string)
 
 The name of the environment variable that contains the private key which should be used for authentication with the server.
+
+### `port` (Optional, string)
+
+The server port which should be used for the SSH connection. Defaults to "22".
 
 ## Developing
 
