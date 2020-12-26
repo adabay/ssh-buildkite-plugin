@@ -31,13 +31,13 @@ do
 
     echo "Processing command $rawCommand ..."
 
-    echo -e ":arrows_counterclockwise: Checking if $rawCommand exists as script file on server."
+    echo -e "Checking if $rawCommand exists as script file on server."
     ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
     if [ $? -eq 0 ]; then
-        echo -e ":white_check_mark: Script file $rawCommand found on server."
+        echo -e "\xE2\x9C\x94 Script file $rawCommand found on server."
         scriptFileOnServer=true
     else
-        echo -e ":x: Script file $rawCommand not found on server."
+        echo -e "\xE2\x9D\x8C Script file $rawCommand not found on server."
         scriptFileOnServer=false
     fi
 
