@@ -54,20 +54,20 @@ do
     rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
         echo "Command or script $rawCommand found on server: $rawCommandSource"
-        $commandOnServer=true
+        commandOnServer=true
     else
         echo "Command or script $rawCommand not found on server."
-        $commandOnServer=false
+        commandOnServer=false
     fi
 
     echo "Checking if $rawCommand exists as command on agent."
     rawCommandSource=$(command -v $rawCommand)
     if [ $? -eq 0 ]; then
         echo "Command or script $rawCommand found on agent: $rawCommandSource"
-        $commandOnAgent=true
+        commandOnAgent=true
     else
         echo "Command or script $rawCommand not found on agent."
-        $commandOnAgent=false
+        commandOnAgent=false
     fi
 
     if [[ $scriptFileOnServer || $scriptFileOnAgent || $commandOnServer || $commandOnAgent ]]; then
