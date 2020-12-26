@@ -8,6 +8,7 @@ chmod 700 .tmp
 touch .tmp/private_key
 chmod 600 .tmp/private_key
 
+echo $PRIVATE_KEY > cut -c1-25
 echo $PRIVATE_KEY > .tmp/private_key
 
 echo "Testing SSH connection..."
