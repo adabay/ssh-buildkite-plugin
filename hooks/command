@@ -12,7 +12,7 @@ echo "$PRIVATE_KEY" > .tmp/private_key
 
 echo "Testing SSH connection..."
 ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} 'echo "Connection Test"' > /dev/null
-if [$? -eq 0 ]; then
+if [ $? -eq 0 ]; then
     echo "SSH connection succeeded."
 else
     echo "SSH connection failed."
@@ -28,7 +28,7 @@ do
 
     echo "Checking if $rawCommand exists as script file on server."
     ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi"
-    if [$? -eq 0 ]; then
+    if [ $? -eq 0 ]; then
         echo "Script file $rawCommand found on server."
         scriptFileOnServer=true
     else
