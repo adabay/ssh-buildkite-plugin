@@ -20,10 +20,10 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      maierj/ssh#v0.9.0:
-        server_address: "127.0.0.1"
-        username: "admin"
-        private_key_env_variable: "SSH_PRIVATE_KEY"
+      - maierj/ssh#v0.9.0:
+          server_address: "127.0.0.1"
+          username: "admin"
+          private_key_env_variable: "SSH_PRIVATE_KEY"
 ```
 
 ## Configuration
