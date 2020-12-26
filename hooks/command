@@ -32,7 +32,7 @@ do
     echo "Processing command $rawCommand ..."
 
     echo "Checking if $rawCommand exists as script file on server."
-    ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -s" -- < "if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi"
+    ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
     if [ $? -eq 0 ]; then
         echo "Script file $rawCommand found on server."
         scriptFileOnServer=true
@@ -51,7 +51,7 @@ do
     fi
 
     echo "Checking if $rawCommand exists as command on server."
-    rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -s" -- < "command -v $rawCommand")
+    rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
         echo "Command or script $rawCommand found on server: $rawCommandSource"
         $commandOnServer=true
