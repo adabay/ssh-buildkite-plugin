@@ -2,27 +2,4 @@
 
 set -eo pipefail
 
-PORT=${BUILDKITE_PLUGIN_SSH_GIT_PORT:-22}
-
-echo "--- Executing script \"$BUILDKITE_PLUGIN_SSH_GIT_SCRIPT_PATH\" on server \"$BUILDKITE_PLUGIN_SSH_GIT_SERVER_ADDRESS:$PORT\"."
-
-mkdir .tmp
-chmod 700 .tmp
-touch .tmp/private_key
-chmod 600 .tmp/private_key
-
-eval echo \"\$$BUILDKITE_PLUGIN_SSH_PRIVATE_KEY_ENV_VARIABLE\" > .tmp/private_key
-
-ssh-add .tmp/private_key
-
-# Add server fingerprint to known hosts
-ssh-keyscan -H $BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS >> ~/.ssh/known_hosts
-
-ssh-add .tmp/private_key
-
 echo "$BUILDKITE_COMMAND"
-
-ssh-add -d .tmp/private_key
-
-rm ${EXPORT_ENV_VARIABLES_SCRIPT_PATH}
-rm -r .tmp
