@@ -2,4 +2,8 @@
 
 set -eo pipefail
 
-echo "$BUILDKITE_COMMAND"
+IFS=$'\n'
+for command in $BUILDKITE_COMMAND
+do
+    echo "$command"
+done
