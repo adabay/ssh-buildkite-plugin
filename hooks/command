@@ -77,7 +77,7 @@ do
     fi
 
     if [[ $commandOnServer ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}  \"bash -c -- $command\""
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}  \"bash -c -- ${command@Q}\""
         echo "Using command from server: $sshCommand"
         commands+=($sshCommand)
     elif [[ $scriptFileOnServer ]]; then
