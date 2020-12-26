@@ -89,7 +89,7 @@ do
         echo "Using command from agent: $sshCommand"
         commands+=($sshCommand)
     elif [[ $scriptFileOnAgent ]]; then
-        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}  \"bash -s\" -- < $command"
+        sshCommand="ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < $command"
         echo "Using script file from agent: $sshCommand"
         commands+=($sshCommand)
     fi
