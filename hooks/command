@@ -41,7 +41,7 @@ do
         scriptFileOnServer=false
     fi
 
-    echo ":arrows_counterclockwise: Checking if $rawCommand exists as script file on agent."
+    echo "Checking if $rawCommand exists as script file on agent."
     if [[ -f $rawCommand ]] ; then
         echo -e "\xE2\x9C\x94 Script file $rawCommand found on agent."
         scriptFileOnAgent=true
@@ -50,7 +50,7 @@ do
         scriptFileOnAgent=false
     fi
 
-    echo ":arrows_counterclockwise: Checking if $rawCommand exists as command on server."
+    echo "Checking if $rawCommand exists as command on server."
     rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Command or script $rawCommand found on server: $rawCommandSource"
@@ -60,7 +60,7 @@ do
         commandOnServer=false
     fi
 
-    echo ":arrows_counterclockwise: Checking if $rawCommand exists as command on agent."
+    echo "Checking if $rawCommand exists as command on agent."
     rawCommandSource=$(command -v $rawCommand)
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Command or script $rawCommand found on agent: $rawCommandSource"
