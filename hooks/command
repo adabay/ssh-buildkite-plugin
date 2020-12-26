@@ -1,5 +1,24 @@
 #!/bin/bash
 
+PORT=${BUILDKITE_PLUGIN_SSH_PORT:-22}
+PRIVATE_KEY=$(eval echo \"\$$BUILDKITE_PLUGIN_SSH_PRIVATE_KEY_ENV_VARIABLE\")
+
+mkdir .tmp
+chmod 700 .tmp
+touch .tmp/private_key
+chmod 600 .tmp/private_key
+
+echo $PRIVATE_KEY > .tmp/private_key
+
+echo "Testing SSH connection..."
+ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} 'echo "Connection Test"' > /dev/null
+if [$? -eq 0 ]; then
+    echo "SSH connection succeeded."
+else
+    echo "SSH connection failed."
+    exit 1
+fi
+
 IFS=$'\n'
 for command in $BUILDKITE_COMMAND
 do
@@ -7,18 +26,42 @@ do
 
     echo "Processing command $rawCommand ..."
 
-    if [[ -f $rawCommand ]] ; then
-        echo "Executing local script at path $rawCommand on remote server."
-        echo "ssh user@server \"bash -s\" -- < $command"
+    echo "Checking if $rawCommand exists as script file on server."
+    ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi"
+    if [$? -eq 0 ]; then
+        echo "Script file $rawCommand found on server."
+        scriptFileOnServer=true
     else
-        echo "command -v $rawCommand"
-        rawCommandSource=$(command -v $rawCommand)
-        if [ $? -eq 0 ]; then
-            echo "Command $rawCommand found: $rawCommandSource"
-            echo "ssh user@server \"bash -s\" -- < $command"
-        else
-            echo "Command $rawCommand not found. Aborting pipeline execution."
-            exit 1
-        fi
+        echo "Script file $rawCommand not found on server."
+        scriptFileOnServer=false
+    fi
+
+    echo "Checking if $rawCommand exists as script file on agent."
+    if [[ -f $rawCommand ]] ; then
+        echo "Script file $rawCommand found on agent."
+        scriptFileOnAgent=true
+    else
+        echo "Script file $rawCommand not found on agent."
+        scriptFileOnAgent=false
+    fi
+
+    echo "Checking if $rawCommand exists as command on server."
+    rawCommandSource=$(ssh -i .tmp/private_key -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "command -v $rawCommand")
+    if [ $? -eq 0 ]; then
+        echo "Command or script $rawCommand found on server: $rawCommandSource"
+        # echo "ssh user@server \"bash -s\" -- < $command"
+    else
+        echo "Command or script $rawCommand not found on server."
+        exit 1
+    fi
+
+    echo "Checking if $rawCommand exists as command on agent."
+    rawCommandSource=$(command -v $rawCommand)
+    if [ $? -eq 0 ]; then
+        echo "Command or script $rawCommand found on agent: $rawCommandSource"
+        # echo "ssh user@server \"bash -s\" -- < $command"
+    else
+        echo "Command or script $rawCommand not found on agent."
+        exit 1
     fi
 done
