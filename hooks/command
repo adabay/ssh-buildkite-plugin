@@ -3,12 +3,12 @@
 PORT=${BUILDKITE_PLUGIN_SSH_PORT:-22}
 PRIVATE_KEY="$(eval echo \"\$$BUILDKITE_PLUGIN_SSH_PRIVATE_KEY_ENV_VARIABLE\")"
 
-mkdir .tmp
-chmod 700 .tmp
-touch .tmp/private_key
-chmod 600 .tmp/private_key
+if [ -z $SSH_AGENT_PID ]; then
+   eval `ssh-agent`
+fi
 
-echo "$PRIVATE_KEY" > .tmp/private_key
+ssh-keyscan -H "${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}" -p ${PORT} >> ~/.ssh/known_hosts
+ssh-add - <<< "${PRIVATE_KEY}"
 
 echo "+++ Checking preconditions"
 
