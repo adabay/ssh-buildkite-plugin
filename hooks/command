@@ -31,7 +31,8 @@ for command in $BUILDKITE_COMMAND
 do
     rawCommand=$(echo $command | cut -d " " -f 1)
 
-    echo "Processing command $rawCommand ..."
+    echo "... Processing command $rawCommand"
+    printf "\n"
 
     if [[ ! ${#rawCommand} == ${#command} ]]; then
         commandOptions=$(echo $command | cut -c $((${#rawCommand} + 2))-${#command})
