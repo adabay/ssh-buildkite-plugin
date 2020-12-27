@@ -8,11 +8,11 @@ if [ -z $SSH_AGENT_PID ]; then
 fi
 
 ssh-keyscan -H "${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}" -p ${PORT} >> ~/.ssh/known_hosts
-ssh-add -t 90m - <<< "${PRIVATE_KEY}"
 
 echo "+++ Checking preconditions"
 
 echo "Testing SSH connection..."
+ssh-add -t 20 - <<< "${PRIVATE_KEY}"
 ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} 'echo "Connection Test"' > /dev/null
 if [ $? -eq 0 ]; then
     echo "SSH connection succeeded."
@@ -36,6 +36,7 @@ do
     fi
 
     echo -e "Checking if $rawCommand exists as script file on server."
+    ssh-add -t 20 - <<< "${PRIVATE_KEY}"
     ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"if [[ -f $rawCommand ]] ; then exit 0; else exit 1; fi\""
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Script file $rawCommand found on server."
@@ -55,6 +56,7 @@ do
     fi
 
     echo "Checking if $rawCommand exists as command on server."
+    ssh-add -t 20 - <<< "${PRIVATE_KEY}"
     rawCommandSource=$(ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} "bash -c \"command -v $rawCommand\"")
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Command or script $rawCommand found on server: $rawCommandSource"
@@ -111,5 +113,6 @@ echo "+++ Executing commands on remote server."
 for command in "${commands[@]}"
 do
     echo "Executing command \"$command\""
+    ssh-add -t 20 - <<< "${PRIVATE_KEY}"
     bash -c -- $command
 done
