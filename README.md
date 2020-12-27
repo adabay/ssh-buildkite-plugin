@@ -14,15 +14,80 @@ Also, it sends a test command via SSH to verify that the connection properties a
 
 ## Example
 
-### Inline command example
+### Single inline command example
 
 ```yml
 steps:
-  - command: ls
+  - command: 'echo "Hello World"'
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - maierj/ssh#v0.9.1:
+      - adabay/ssh#v0.9.1:
+          server_address: "127.0.0.1"
+          username: "admin"
+          private_key_env_variable: "SSH_PRIVATE_KEY"
+```
+
+### Multiple inline commands example
+
+```yml
+steps:
+  - command:
+      - 'echo "Hello World"'
+      - 'echo "Hello World 2"'
+    env:
+      SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
+    plugins:
+      - adabay/ssh#v0.9.1:
+          server_address: "127.0.0.1"
+          username: "admin"
+          private_key_env_variable: "SSH_PRIVATE_KEY"
+```
+
+### Agent script example
+
+In this example, `.buildkite/scripts/hello-world` is the path to a script on the agent.
+
+```yml
+steps:
+  - command: '.buildkite/scripts/hello-world'
+    env:
+      SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
+    plugins:
+      - adabay/ssh#v0.9.1:
+          server_address: "127.0.0.1"
+          username: "admin"
+          private_key_env_variable: "SSH_PRIVATE_KEY"
+```
+
+### Server script example
+
+In this example, `/opt/scripts/hello-world` is the path to a script on the server.
+
+```yml
+steps:
+  - command: '/opt/scripts/hello-world'
+    env:
+      SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
+    plugins:
+      - adabay/ssh#v0.9.1:
+          server_address: "127.0.0.1"
+          username: "admin"
+          private_key_env_variable: "SSH_PRIVATE_KEY"
+```
+
+### Buildkite library plugin example
+
+In this example, the `clean-directory` command will be resolved to the script path that belongs to the library plugin `adabay/utilities`.
+
+```yml
+steps:
+  - command: 'clean-directory /var/www/html'
+    env:
+      SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
+    plugins:
+      - adabay/utilities#master: ~
+      - adabay/ssh#v0.9.1:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -51,5 +116,5 @@ The server port which should be used for the SSH connection. Defaults to "22".
 To run the linter:
 
 ```shell
-docker run -it --rm -v "${PWD}:/plugin:ro" buildkite/plugin-linter --id maierj/ssh
+docker run -it --rm -v "${PWD}:/plugin:ro" buildkite/plugin-linter --id adabay/ssh
 ```
