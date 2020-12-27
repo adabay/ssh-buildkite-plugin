@@ -7,7 +7,7 @@ if [ -z $SSH_AGENT_PID ]; then
    eval `ssh-agent`
 fi
 
-ssh-keyscan -H "${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}" -p ${PORT} >> ~/.ssh/known_hosts
+ssh-keyscan -H "${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS}" >> ~/.ssh/known_hosts
 
 echo "+++ Checking preconditions"
 
