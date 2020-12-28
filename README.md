@@ -1,5 +1,9 @@
 # SSH Buildkite Plugin
 
+|Linting|Tests|
+|---|---|
+|[![Build status](https://badge.buildkite.com/d3f6052ddfdb7e2e2000cd12ae3a92ba99b5d87af70aa46ff5.svg?branch=master)](https://buildkite.com/adabay/internal-ssh-buildkite-plugin-linting)|-|
+
 This plugin enables pipelines to execute commands or scripts on remote servers via SSH.
 
 To define the commands or scripts that should be executed via SSH, you can configure the commands in your pipeline as if you wanted to execute them on the agent.
