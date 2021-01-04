@@ -26,7 +26,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.1:
+      - adabay/ssh#v0.9.3:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -42,7 +42,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.1:
+      - adabay/ssh#v0.9.3:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -58,7 +58,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.1:
+      - adabay/ssh#v0.9.3:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -74,7 +74,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.1:
+      - adabay/ssh#v0.9.3:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -91,10 +91,31 @@ steps:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
       - adabay/utilities#master: ~
-      - adabay/ssh#v0.9.1:
+      - adabay/ssh#v0.9.3:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
+```
+
+### Environment variable injection example
+
+In this example, `.buildkite/scripts/hello-world` is the path to a script on the agent, and the script depends on an environment variable called `TEST`.
+The environment variable `TEST` from the client is injected into the SSH session, so it's available when the script is executed on the remote server.
+
+```yml
+steps:
+  - command: '.buildkite/scripts/hello-world'
+    env:
+      SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
+      TEST: "test"
+    plugins:
+      - adabay/utilities#master: ~
+      - adabay/ssh#v0.9.3:
+          server_address: "127.0.0.1"
+          username: "admin"
+          private_key_env_variable: "SSH_PRIVATE_KEY"
+          injected_env_variables:
+            - TEST
 ```
 
 ## Configuration
@@ -114,6 +135,10 @@ The name of the environment variable that contains the private key which should 
 ### `port` (Optional, string)
 
 The server port which should be used for the SSH connection. Defaults to "22".
+
+### `injected_env_variables` (Optional, array)
+
+A list of names of environment variables that should be injected into the SSH session.
 
 ## Developing
 
