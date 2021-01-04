@@ -109,7 +109,6 @@ steps:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
       TEST: "test"
     plugins:
-      - adabay/utilities#master: ~
       - adabay/ssh#v0.9.3:
           server_address: "127.0.0.1"
           username: "admin"
