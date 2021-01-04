@@ -12,6 +12,8 @@ configuration:
       type: string
     private_key_env_variable:
       type: string
+    injected_env_variables:
+      type: array
   required:
     - server_address
     - username

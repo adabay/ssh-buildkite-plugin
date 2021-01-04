@@ -23,6 +23,31 @@ fi
 
 printf "\n"
 
+injected_env_variables=()
+envVariableDefinition=""
+
+while IFS='=' read -r injected_env_variable _ ; do
+  if [[ $injected_env_variable =~ ^(BUILDKITE_PLUGIN_SSH_INJECTED_ENV_VARIABLES_[0-9]+$) ]]; then
+    MULTIPLE_INJECTED_ENV_VARIABLES="true"
+    injected_env_variables+=("${!injected_env_variable}")
+  fi
+done < <(env | sort)
+
+if [[ "${MULTIPLE_INJECTED_ENV_VARIABLES}" == "true" ]]; then
+    index=0
+
+    for injected_env_variable in "${injected_env_variables[@]}"
+    do
+        injected_env_variable_env_var="BUILDKITE_PLUGIN_SSH_INJECTED_ENV_VARIABLES_${index}"
+
+        injected_env_variable_name="${!injected_env_variable_env_var}"
+
+        envVariableDefinition="${envVariableDefinition} ${injected_env_variable_name}=\"${!injected_env_variable_name}\""
+
+        ((index+=1))
+    done
+fi
+
 commands=()
 allCommandsValid=true
 
@@ -96,19 +121,19 @@ do
     printf "\n"
 
     if [[ "$commandOnServer" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -c -- ${command}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -c -- ${command}"
         echo "Using command from server: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$scriptFileOnServer" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash $command"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash $command"
         echo "Using script file from server: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$commandOnAgent" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${rawCommandSource} ${commandOptions}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -s -- < ${rawCommandSource} ${commandOptions}"
         echo "Using command from agent: $sshCommand"
         commands+=($sshCommand)
     elif [[ "$scriptFileOnAgent" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- bash -s -- < ${command}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -s -- < ${command}"
         echo "Using script file from agent: $sshCommand"
         commands+=($sshCommand)
     fi
