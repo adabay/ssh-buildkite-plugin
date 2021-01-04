@@ -167,6 +167,12 @@ do
     echo "Executing command \"${printableCommands[$commandIndex]}\""
     ssh-add -t 20 - <<< "${PRIVATE_KEY}" >/dev/null 2>&1
     bash -c -- $command
+    if [ $? -eq 0 ]; then
+        echo -e "\xE2\x9C\x94 Command executed successfully."
+    else
+        echo -e "\xE2\x9D\x8C Command failed. Aborting execution."
+        exit 1
+    fi
     printf "\n"
     ((commandIndex+=1))
 done
