@@ -26,7 +26,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.3:
+      - adabay/ssh#v0.9.4:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -42,7 +42,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.3:
+      - adabay/ssh#v0.9.4:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -58,7 +58,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.3:
+      - adabay/ssh#v0.9.4:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -74,7 +74,7 @@ steps:
     env:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
-      - adabay/ssh#v0.9.3:
+      - adabay/ssh#v0.9.4:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -91,7 +91,7 @@ steps:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
     plugins:
       - adabay/utilities#master: ~
-      - adabay/ssh#v0.9.3:
+      - adabay/ssh#v0.9.4:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
@@ -109,7 +109,7 @@ steps:
       SSH_PRIVATE_KEY: "--- PRIVATE KEY ---"
       TEST: "test"
     plugins:
-      - adabay/ssh#v0.9.3:
+      - adabay/ssh#v0.9.4:
           server_address: "127.0.0.1"
           username: "admin"
           private_key_env_variable: "SSH_PRIVATE_KEY"
