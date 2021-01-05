@@ -14,6 +14,8 @@ configuration:
       type: string
     injected_env_variables:
       type: array
+    debug:
+      type: boolean
   required:
     - server_address
     - username
