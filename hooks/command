@@ -123,7 +123,7 @@ do
 
     printf "\n"
 
-    $escapedEnvVariableDefinition = "$(sed "s|'|\\\\'|g" <<< $envVariableDefinition)"
+    escapedEnvVariableDefinition="$(sed "s|'|\\\\'|g" <<< $envVariableDefinition)"
 
     if [[ "$commandOnServer" == true ]]; then
         sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -c -- ${command}"
