@@ -185,7 +185,7 @@ for command in "${commands[@]}"
 do
     echo "Executing command \"${printableCommands[$commandIndex]}\""
     ssh-add -t 20 - <<< "${PRIVATE_KEY}" >/dev/null 2>&1
-    bash -c -- $command
+    bash -c -- $''"${command}"''
     if [ $? -eq 0 ]; then
         echo -e "\xE2\x9C\x94 Command executed successfully."
     else
