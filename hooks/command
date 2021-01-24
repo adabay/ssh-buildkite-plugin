@@ -145,7 +145,7 @@ do
         commands+=($sshCommand)
         printableCommands+=($printableSshCommand)
     elif [[ "$commandOnAgent" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -s -- < ${rawCommandSource} ${commandOptions}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition} bash -s -- < ${rawCommandSource} ${commandOptions}'"
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
@@ -156,7 +156,7 @@ do
         commands+=($sshCommand)
         printableCommands+=($printableSshCommand)
     elif [[ "$scriptFileOnAgent" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -s -- < ${command}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition} bash -s -- < ${command}'"
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
