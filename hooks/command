@@ -149,7 +149,7 @@ do
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
-          printableSshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${printableEnvVariableDefinition} bash -s -- < ${rawCommandSource} ${commandOptions}"
+          printableSshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${printableEnvVariableDefinition} bash -s -- < ${rawCommandSource} ${commandOptions}'"
         fi
 
         echo "Using command from agent: $printableSshCommand"
