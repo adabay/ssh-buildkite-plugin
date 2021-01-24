@@ -43,7 +43,7 @@ if [[ "${MULTIPLE_INJECTED_ENV_VARIABLES}" == "true" ]]; then
 
         injected_env_variable_name="${!injected_env_variable_env_var}"
 
-        envVariableDefinition="${envVariableDefinition} ${injected_env_variable_name}='$(sed "s|'|\\\\'|g" <<< ${!injected_env_variable_name})'"
+        envVariableDefinition="${envVariableDefinition} ${injected_env_variable_name}='${!injected_env_variable_name}'"
         printableEnvVariableDefinition="${printableEnvVariableDefinition} ${injected_env_variable_name}='**obscured**'"
 
         ((index+=1))
@@ -123,6 +123,8 @@ do
 
     printf "\n"
 
+    escapedEnvVariableDefinition="$(sed "s|'|\\\\'|g" <<< $envVariableDefinition)"
+
     if [[ "$commandOnServer" == true ]]; then
         sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash -c -- ${command}"
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
@@ -145,7 +147,7 @@ do
         commands+=($sshCommand)
         printableCommands+=($printableSshCommand)
     elif [[ "$commandOnAgent" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition}' bash -s -- < ${rawCommandSource} ${commandOptions}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${escapedEnvVariableDefinition}' bash -s -- < ${rawCommandSource} ${commandOptions}"
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
@@ -156,7 +158,7 @@ do
         commands+=($sshCommand)
         printableCommands+=($printableSshCommand)
     elif [[ "$scriptFileOnAgent" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition}' bash -s < ${command}"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${escapedEnvVariableDefinition}' bash -s < ${command}"
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
