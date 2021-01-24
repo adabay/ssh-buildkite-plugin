@@ -44,7 +44,7 @@ if [[ "${MULTIPLE_INJECTED_ENV_VARIABLES}" == "true" ]]; then
         injected_env_variable_name="${!injected_env_variable_env_var}"
 
         esc_value="$(sed "s|'|\\\\'|g" <<< ${!injected_env_variable_name})"
-        esc_value="$(sed "s|\"|\\\\\"|g" <<< $esc_value)"
+        esc_value="$(sed "s|\"|\\\\\\\"|g" <<< $esc_value)"
 
         envVariableDefinition="${envVariableDefinition} ${injected_env_variable_name}=\"${esc_value}\""
         printableEnvVariableDefinition="${printableEnvVariableDefinition} ${injected_env_variable_name}=\"**obscured**\""
