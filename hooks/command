@@ -129,11 +129,11 @@ do
     printf "\n"
 
     if [[ "$commandOnServer" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition}' bash -c -- \"\'${command}\'\""
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition}' bash -c -- \"'${command}'\""
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
-          printableSshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${printableEnvVariableDefinition}' bash -c -- \"\'${command}\'\""
+          printableSshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${printableEnvVariableDefinition}' bash -c -- \"'${command}'\""
         fi
         echo "Using command from server: $printableSshCommand"
         commands+=($sshCommand)
