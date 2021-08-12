@@ -46,7 +46,7 @@ if [[ "${MULTIPLE_INJECTED_ENV_VARIABLES}" == "true" ]]; then
         esc_value=$(sed "s|\\\\|\\\\\\\\\\\\\\\\|g" <<< ${!injected_env_variable_name})
         esc_value=$(sed "s|'|\\\\'|g" <<< ${esc_value})
         esc_value=$(sed "s|\"|\\\\\\\\\"|g" <<< $esc_value)
-        esc_value=$(sed "s|\`|\\\\\`|g" <<< $esc_value)
+        esc_value=$(sed "s|\`|\\\\\\\\\`|g" <<< $esc_value)
 
         envVariableDefinition="${envVariableDefinition} ${injected_env_variable_name}=\"${esc_value}\""
         printableEnvVariableDefinition="${printableEnvVariableDefinition} ${injected_env_variable_name}=\"**obscured**\""
@@ -129,6 +129,7 @@ do
     printf "\n"
 
     if [[ "$commandOnServer" == true ]]; then
+        command=$(sed "s|\$|\\\\$|g" <<< ${command})
         sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition}' bash -c -- \"'${command}'\""
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
