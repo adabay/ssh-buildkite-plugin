@@ -139,11 +139,11 @@ do
         commands+=($sshCommand)
         printableCommands+=($printableSshCommand)
     elif [[ "$scriptFileOnServer" == true ]]; then
-        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${envVariableDefinition} bash $command"
+        sshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${envVariableDefinition}' bash $command"
         if [[ "$BUILDKITE_PLUGIN_SSH_DEBUG" == true ]]; then
           printableSshCommand="$sshCommand"
         else
-          printableSshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- ${printableEnvVariableDefinition} bash $command"
+          printableSshCommand="ssh -p ${PORT} ${BUILDKITE_PLUGIN_SSH_USERNAME}@${BUILDKITE_PLUGIN_SSH_SERVER_ADDRESS} -- \$'${printableEnvVariableDefinition}' bash $command"
         fi
 
         echo "Using script file from server: $printableSshCommand"
